@@ -116,6 +116,25 @@ const toggleUserStatus = async (req, res) => {
     }
 };
 
+const login = async (req, res) => {
+    try {
+        const result = await userService.login(
+            req.body.email,
+            req.body.password
+        );
+
+        res.json({
+            message: "Login successful",
+            data: result,
+        });
+
+    } catch (error) {
+        res.status(400).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     createUser,
     getUsers,
@@ -123,4 +142,5 @@ module.exports = {
     updateUser,
     deleteUser,
     toggleUserStatus,
+    login,
 };

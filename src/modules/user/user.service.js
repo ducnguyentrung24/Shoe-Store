@@ -1,5 +1,7 @@
 const User = require("./user.model");
 const { hashPassword } = require("../../utils/hash");
+const { comparePassword } = require("../../utils/hash");
+const { generateToken } = require("../../utils/jwt");
 
 const createUser = async (data) => {
     const existingUser = await User.findOne({ email: data.email });
@@ -52,6 +54,36 @@ const toggleUserStatus = async (id, isActive) => {
     ).select("-password");
 };
 
+const login = async (email, password) => {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (!user.isActive) {
+        throw new Error("Account is locked");
+    }
+
+    const isMatch = await comparePassword(password, user.password);
+
+    if (!isMatch) {
+        throw new Error("Wrong password");
+    }
+
+    const token = generateToken(user);
+
+    const userObj = user.toObject();
+    delete userObj.password; // Xóa trường password trước khi trả về
+
+    return {
+        user: userObj,
+        token,
+    };
+};
+
+
+
 module.exports = {
     createUser,
     getUsers,
@@ -59,4 +91,5 @@ module.exports = {
     updateUser,
     deleteUser,
     toggleUserStatus,
+    login,
 };
