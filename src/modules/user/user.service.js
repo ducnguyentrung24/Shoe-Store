@@ -82,7 +82,29 @@ const login = async (email, password) => {
     };
 };
 
+const updateMe = async (userId, data) => {
+    const user = await User.findByIdAndUpdate(
+        userId,
+        data,
+        { new: true, runValidators: true }
+    ).select("-password");
+    
+    if (!user) {
+        throw new Error("User not found");
+    }
 
+    return user;
+};
+
+const deleteMe = async (userId) => {
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    return user;
+};
 
 module.exports = {
     createUser,
@@ -92,4 +114,6 @@ module.exports = {
     deleteUser,
     toggleUserStatus,
     login,
+    updateMe,
+    deleteMe,
 };

@@ -135,6 +135,40 @@ const login = async (req, res) => {
     }
 };
 
+const updateMe = async (req, res) => {
+    try {
+        const user = await userService.updateMe(
+            req.user.id, 
+            req.body
+        );
+        res.json({
+            message: "Profile updated successfully",
+            data: user,
+        });
+
+    } catch (error) {
+        res.status(400).json({
+            message: error.message,
+        });
+    }
+};
+
+const deleteMe = async (req, res) => {
+    try {
+        await userService.deleteMe(req.user.id);
+
+        res.json({
+            message: "Account deleted successfully",
+        });
+
+    } catch (error) {
+        res.status(400).json({
+            message: error.message,
+        });
+    }
+
+};
+
 module.exports = {
     createUser,
     getUsers,
@@ -143,4 +177,6 @@ module.exports = {
     deleteUser,
     toggleUserStatus,
     login,
+    updateMe,
+    deleteMe,
 };
