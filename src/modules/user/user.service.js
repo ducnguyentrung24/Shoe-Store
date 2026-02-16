@@ -1,4 +1,5 @@
 const User = require("./user.model");
+const { hashPassword } = require("../../utils/hash");
 
 const createUser = async (data) => {
     const existingUser = await User.findOne({ email: data.email });
@@ -7,7 +8,18 @@ const createUser = async (data) => {
         throw new Error("Email already exists");
     }
 
-    return await User.create(data);
+    // Hash password trước khi lưu vào database
+    const hashedPassword = await hashPassword(data.password);
+    
+    const newUser = await User.create({
+        ...data,
+        password: hashedPassword,
+    });
+
+    const userObj = newUser.toObject();
+    delete userObj.password; // Xóa trường password trước khi trả về
+
+    return userObj;
 };
 
 const getUsers = async () => {
